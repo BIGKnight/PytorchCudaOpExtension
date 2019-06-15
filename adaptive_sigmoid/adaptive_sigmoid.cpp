@@ -34,7 +34,11 @@ at::Tensor adaptive_sigmoid_forward(
 std::vector<at::Tensor> adaptive_sigmoid_backward(
     at::Tensor input,
     at::Tensor params,
-    at::Tensor grad_outputs
+    at::Tensor grad_outputs,
+    bool alpha_update,
+    bool beta_update,
+    bool gamma_update,
+    bool theta_update
 ){
     int batch = input.size(0);
     int channels = input.size(1);
@@ -69,7 +73,8 @@ std::vector<at::Tensor> adaptive_sigmoid_backward(
             grad_output_instance_ptr,
             params_ptr,
             grad_params_ptr,
-            channels, height, width
+            channels, height, width,
+            alpha_update, beta_update, gamma_update, theta_update
         );
     }
     

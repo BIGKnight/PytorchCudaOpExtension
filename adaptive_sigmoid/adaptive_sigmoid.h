@@ -32,7 +32,11 @@ void adaptive_sigmoid_params_grad(
     const float* grad_outputs,
     const float* params,
     float* grad_params,
-    int channels, int height, int width
+    int channels, int height, int width,
+    bool alpha_update, 
+    bool beta_update,
+    bool gamma_update,
+    bool theta_update
 );
 
 #endif

@@ -53,7 +53,11 @@ __global__ void adaptive_sigmoid_params_grad_kernel(
     const float* data_in,
     const float* grad_output,
     const float* params,
-    float* grad_params
+    float* grad_params,
+    bool alpha_update, 
+    bool beta_update,
+    bool gamma_update,
+    bool theta_update
 ){
     CUDA_KERNEL_LOOP(index, n){
         float alpha = params[0];
@@ -71,11 +75,14 @@ __global__ void adaptive_sigmoid_params_grad_kernel(
         // float d_beta = 0;
         // float d_gamma = 0;
         // float d_theta = 0;
-        
-        atomicAdd(grad_params + 0, d_alpha * d_grad_output);
-        atomicAdd(grad_params + 1, d_beta * d_grad_output);
-        atomicAdd(grad_params + 2, d_gamma * d_grad_output);
-        atomicAdd(grad_params + 3, d_theta * d_grad_output);
+        if (alpha_update)
+            atomicAdd(grad_params + 0, d_alpha * d_grad_output);
+        if (beta_update)
+            atomicAdd(grad_params + 1, d_beta * d_grad_output);
+        if (gamma_update)
+            atomicAdd(grad_params + 2, d_gamma * d_grad_output);
+        if (theta_update)
+            atomicAdd(grad_params + 3, d_theta * d_grad_output);
     }
 }
 
@@ -119,7 +126,11 @@ void adaptive_sigmoid_params_grad(
     const float* grad_outputs,
     const float* params,
     float* grad_params,
-    int channels, int height, int width
+    int channels, int height, int width,
+    bool alpha_update, 
+    bool beta_update,
+    bool gamma_update,
+    bool theta_update
 ){
     int num_kernels = channels * height * width;
     adaptive_sigmoid_params_grad_kernel<<<GET_BLOCKS(num_kernels), CUDA_NUM_THREADS, 0, stream>>>(
@@ -127,6 +138,10 @@ void adaptive_sigmoid_params_grad(
         data_in,
         grad_outputs,
         params,
-        grad_params
+        grad_params,
+        alpha_update, 
+        beta_update,
+        gamma_update,
+        theta_update
     );
 }
